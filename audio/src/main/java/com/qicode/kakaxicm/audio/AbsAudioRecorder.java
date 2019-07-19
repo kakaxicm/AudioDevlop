@@ -2,9 +2,11 @@ package com.qicode.kakaxicm.audio;
 
 import android.content.Context;
 
+import com.qicode.kakaxicm.audio.listener.RecordAudioListener;
+
 public abstract class AbsAudioRecorder implements IRecorder {
 
-    //    protected RecordAudioListener listener;
+    protected RecordAudioListener listener;
     //TODO 录音过程和结果监听
     protected int checkTime;//没隔多久监听一次
     protected static final int AUDIO_MIN_DURATION = 5 * 1000;
@@ -16,9 +18,10 @@ public abstract class AbsAudioRecorder implements IRecorder {
 
     protected Context context;
 
-    protected AbsAudioRecorder(Context context) {
+    protected AbsAudioRecorder(Context context, RecordAudioListener listener) {
         this.context = context;
         checkTime = 500;
+        this.listener = listener;
     }
 
     /**

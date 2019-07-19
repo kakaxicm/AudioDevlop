@@ -6,6 +6,7 @@ import android.media.MediaFormat;
 import android.util.Log;
 
 import com.qicode.kakaxicm.audio.format.FormatInfo;
+import com.qicode.kakaxicm.audio.utils.CloseUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,6 +75,21 @@ public class RealPcmToAacHandler {
         } catch (Throwable t) {
             Log.e("RealPcmToAacHandler", t.getLocalizedMessage());
             return false;
+        }
+    }
+
+    public boolean end() {
+        try {
+            encode(null);
+            if (audioEncoder != null) {
+                audioEncoder.release();
+            }
+            return true;
+        } catch (Throwable t) {
+            Log.e("RealPcmToAacHandler", t.getLocalizedMessage());
+            return false;
+        } finally {
+            CloseUtils.closeOutput(aacOutput);
         }
     }
 

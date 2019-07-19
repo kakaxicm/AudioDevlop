@@ -6,14 +6,62 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+import com.qicode.kakaxicm.audio.AbsAudioRecorder;
+import com.qicode.kakaxicm.audio.AudioRecordResult;
+import com.qicode.kakaxicm.audio.KAudioRecorder;
+import com.qicode.kakaxicm.audio.listener.RecordAudioListener;
+import com.qicode.kakaxicm.audio.listener.RecordDataCallback;
+import com.qicode.kakaxicm.utils.StorageUtils;
+
+import java.io.File;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private AbsAudioRecorder recorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestPermission();
+        recorder = new KAudioRecorder(this, new RecordAudioListener() {
+            @Override
+            public void onStart() {
+                Log.e("AbsAudioRecorder", "onStart");
+            }
+
+            @Override
+            public void onDuration(long duration, long maxDuration) {
+                Log.e("AbsAudioRecorder", "onDuration:" + duration + "," + maxDuration);
+            }
+
+            @Override
+            public void onFinish(AudioRecordResult result) {
+                Log.e("AbsAudioRecorder", "onFinish:" + result.toString());
+            }
+
+            @Override
+            public void onError(String msg) {
+                Log.e("AbsAudioRecorder", "onError:" + msg);
+            }
+
+            @Override
+            public void onCancel() {
+                Log.e("AbsAudioRecorder", "onCancel:");
+            }
+        });
+        ((KAudioRecorder) recorder).setAudioDataCallback(new RecordDataCallback() {
+            @Override
+            public void onData(byte[] data) {
+                Log.e("AbsAudioRecorder", "data.len:" + data.length);
+            }
+        });
+        ((KAudioRecorder) recorder).setPcmFile(new File(StorageUtils.getCommonCacheDir(this, "audio"), "audio_" + System.currentTimeMillis() + ".pcm"));
+        findViewById(R.id.start).setOnClickListener(this);
+        findViewById(R.id.cancel).setOnClickListener(this);
+        findViewById(R.id.stop).setOnClickListener(this);
     }
 
 
@@ -50,6 +98,18 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
             }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        final int id = v.getId();
+        if (id == R.id.start) {
+            recorder.start();
+        } else if (id == R.id.cancel) {
+            recorder.cancel();
+        } else if (id == R.id.stop) {
+            recorder.stop();
         }
     }
 }
