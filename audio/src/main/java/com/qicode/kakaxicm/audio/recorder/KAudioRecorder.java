@@ -165,8 +165,6 @@ public class KAudioRecorder extends AbsAudioRecorder {
                 totalBytes += read;
                 //数据编码,写pcm文件
                 handleExe.execute(new ProcessRecordDataTask(fos, pcmToAacHandler, speex, mBuffer, audioDataCallback));
-//                handleExe.execute(new ProcessDataTask(fos, pcmHandler, mBuffer, arrayPool, resampleCallback, speex,
-//                        audioDataCallback));
             }
 
             long ct = System.currentTimeMillis();
