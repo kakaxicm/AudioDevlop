@@ -2,6 +2,9 @@ package com.qicode.kakaxicm.audiodevlop;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +20,7 @@ import com.qicode.kakaxicm.audio.listener.RecordDataCallback;
 import com.qicode.kakaxicm.utils.StorageUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private AbsAudioRecorder recorder;
@@ -39,7 +43,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onFinish(AudioRecordResult result) {
-                Log.e("AbsAudioRecorder", "onFinish:" + result.toString());
+                File file = new File(result.filePath);
+                Log.e("AbsAudioRecorder", "onFinish:" + result.toString() + "录音文件是否存在:" + file.exists() + ",文件大小:" + file.length());
+
+                testPlay(result.filePath);
             }
 
             @Override
@@ -55,13 +62,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((KAudioRecorder) recorder).setAudioDataCallback(new RecordDataCallback() {
             @Override
             public void onData(byte[] data) {
-                Log.e("AbsAudioRecorder", "data.len:" + data.length);
+//                Log.e("AbsAudioRecorder", "data.len:" + data.length);
             }
         });
         ((KAudioRecorder) recorder).setPcmFile(new File(StorageUtils.getCommonCacheDir(this, "audio"), "audio_" + System.currentTimeMillis() + ".pcm"));
         findViewById(R.id.start).setOnClickListener(this);
         findViewById(R.id.cancel).setOnClickListener(this);
         findViewById(R.id.stop).setOnClickListener(this);
+    }
+
+    private void testPlay(String path) {
+        final MediaPlayer player = new MediaPlayer();
+        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            player.setDataSource(path);
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    player.start();
+                }
+            });
+            player.prepareAsync();
+        } catch (IOException e) {
+            Log.e("AbsAudioRecorder", "播放异常:" + e);
+        }
     }
 
 

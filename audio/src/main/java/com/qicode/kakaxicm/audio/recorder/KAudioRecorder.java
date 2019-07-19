@@ -6,11 +6,11 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.lurenjia.android.base.media.audio.record.Speex;
 import com.qicode.kakaxicm.audio.format.FormatInfo;
 import com.qicode.kakaxicm.audio.handler.RealPcmToAacHandler;
 import com.qicode.kakaxicm.audio.listener.RecordAudioListener;
 import com.qicode.kakaxicm.audio.listener.RecordDataCallback;
-import com.lurenjia.android.base.media.audio.record.Speex;
 import com.qicode.kakaxicm.audio.task.EndRecordTask;
 import com.qicode.kakaxicm.audio.task.ProcessRecordDataTask;
 import com.qicode.kakaxicm.audio.utils.MainThreadUtils;

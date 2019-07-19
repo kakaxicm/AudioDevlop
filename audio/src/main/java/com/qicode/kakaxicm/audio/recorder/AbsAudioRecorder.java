@@ -9,7 +9,7 @@ public abstract class AbsAudioRecorder implements IRecorder {
     protected RecordAudioListener listener;
     //TODO 录音过程和结果监听
     protected int checkTime;//没隔多久监听一次
-    protected static final int AUDIO_MIN_DURATION = 5 * 1000;
+    protected static final int AUDIO_MIN_DURATION = 1 * 1000;
     //默认最长时间5分钟
     public static final int AUDIO_MAX_DURATION = 5 * 60 * 1000;
 
