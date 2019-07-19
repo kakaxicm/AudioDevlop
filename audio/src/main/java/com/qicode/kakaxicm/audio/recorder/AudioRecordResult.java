@@ -1,4 +1,4 @@
-package com.qicode.kakaxicm.audio;
+package com.qicode.kakaxicm.audio.recorder;
 
 public class AudioRecordResult {
     /**

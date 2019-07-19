@@ -9,9 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.qicode.kakaxicm.audio.AbsAudioRecorder;
-import com.qicode.kakaxicm.audio.AudioRecordResult;
-import com.qicode.kakaxicm.audio.KAudioRecorder;
+import com.qicode.kakaxicm.audio.recorder.AbsAudioRecorder;
+import com.qicode.kakaxicm.audio.recorder.AudioRecordResult;
+import com.qicode.kakaxicm.audio.recorder.KAudioRecorder;
 import com.qicode.kakaxicm.audio.listener.RecordAudioListener;
 import com.qicode.kakaxicm.audio.listener.RecordDataCallback;
 import com.qicode.kakaxicm.utils.StorageUtils;

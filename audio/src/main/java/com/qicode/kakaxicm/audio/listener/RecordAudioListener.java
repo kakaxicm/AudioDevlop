@@ -1,6 +1,6 @@
 package com.qicode.kakaxicm.audio.listener;
 
-import com.qicode.kakaxicm.audio.AudioRecordResult;
+import com.qicode.kakaxicm.audio.recorder.AudioRecordResult;
 
 public interface RecordAudioListener {
     void onStart();
