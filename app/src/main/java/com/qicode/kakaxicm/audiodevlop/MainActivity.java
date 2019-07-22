@@ -17,6 +17,7 @@ import com.qicode.kakaxicm.audio.recorder.AudioRecordResult;
 import com.qicode.kakaxicm.audio.recorder.KAudioRecorder;
 import com.qicode.kakaxicm.audio.listener.RecordAudioListener;
 import com.qicode.kakaxicm.audio.listener.RecordDataCallback;
+import com.qicode.kakaxicm.audio.ui.widget.AudioWaveTransView;
 import com.qicode.kakaxicm.utils.StorageUtils;
 
 import java.io.File;
@@ -24,11 +25,13 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private AbsAudioRecorder recorder;
+    private AudioWaveTransView audioWaveTransView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        audioWaveTransView = findViewById(R.id.wave_view);
         requestPermission();
         recorder = new KAudioRecorder(this, new RecordAudioListener() {
             @Override
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onData(byte[] data) {
 //                Log.e("AbsAudioRecorder", "data.len:" + data.length);
+                audioWaveTransView.insertData(data);
             }
         });
         ((KAudioRecorder) recorder).setPcmFile(new File(StorageUtils.getCommonCacheDir(this, "audio"), "audio_" + System.currentTimeMillis() + ".pcm"));
