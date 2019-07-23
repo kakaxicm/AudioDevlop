@@ -49,7 +49,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 File file = new File(result.filePath);
                 Log.e("AbsAudioRecorder", "onFinish:" + result.toString() + "录音文件是否存在:" + file.exists() + ",文件大小:" + file.length());
 
-                testPlay(result.filePath);
+//                testPlay(result.filePath);
+                audioWaveTransView.stop();
+
             }
 
             @Override
@@ -66,7 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onData(byte[] data) {
 //                Log.e("AbsAudioRecorder", "data.len:" + data.length);
-                audioWaveTransView.insertData(data);
+                if (recorder != null && recorder.isRecording()){
+                    audioWaveTransView.insertData(data);
+                }
+                Log.e("audio_split", "onData");
             }
         });
         ((KAudioRecorder) recorder).setPcmFile(new File(StorageUtils.getCommonCacheDir(this, "audio"), "audio_" + System.currentTimeMillis() + ".pcm"));
@@ -138,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             recorder.cancel();
         } else if (id == R.id.stop) {
             recorder.stop();
+//            audioWaveTransView.stop();
         }
     }
 }

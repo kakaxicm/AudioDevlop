@@ -66,7 +66,6 @@ public class KAudioRecorder extends AbsAudioRecorder {
 
     @Override
     public boolean start() {
-//        if (isPermissionEnabled) {
         if (isRecording) {
             return true;
         }
@@ -78,16 +77,12 @@ public class KAudioRecorder extends AbsAudioRecorder {
                 try {
                     doRecord();
                 } catch (Throwable t) {
-                    int i = 0;
-//                        error(t);
+                    error(t);
                     Log.e("AbsAudioRecorder", t.getLocalizedMessage());
-                } finally {
                 }
             }
         });
         return true;
-//        }
-//        return false;
     }
 
     private void doRecord() throws IOException {
@@ -128,7 +123,6 @@ public class KAudioRecorder extends AbsAudioRecorder {
 //            speex.resampleInit(format.sampleRateInHz, resampleCallback.outRate());
 //        }
         //进度校验
-        //TODO
         if (listener != null) {
             MainThreadUtils.post(new Runnable() {
                 @Override
@@ -206,7 +200,7 @@ public class KAudioRecorder extends AbsAudioRecorder {
         MainThreadUtils.post(new Runnable() {
             @Override
             public void run() {
-                //TODO 录音回调
+                //录音回调
                 if (listener != null) {
                     listener.onFinish(r);
                 }
@@ -248,7 +242,7 @@ public class KAudioRecorder extends AbsAudioRecorder {
             file.delete();
         }
         isRecording = false;
-        //TODO 错误的回调
+        //错误的回调
         if (listener != null) {
             listener.onError(e.getLocalizedMessage());
         }
@@ -288,6 +282,6 @@ public class KAudioRecorder extends AbsAudioRecorder {
 
     @Override
     public boolean isRecording() {
-        return false;
+        return isRecording;
     }
 }

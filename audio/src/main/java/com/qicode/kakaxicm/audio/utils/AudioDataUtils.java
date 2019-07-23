@@ -20,6 +20,7 @@ public class AudioDataUtils {
             AudioWaveTransView.Pos pos = new AudioWaveTransView.Pos();
             int count = 0;
             int energy;
+            //先取40ms数据的均值
             for (int j = i * N; j < N * numOf40Ms && j < pcmData.length - 1; j += 2) {
                 energy = Math.abs(mixByte((pcmData[j]), (pcmData[j + 1])));
                 count++;
@@ -28,6 +29,7 @@ public class AudioDataUtils {
             if (count <= 0) {
                 count = 1;
             }
+            //均值+采样点均指加权
             pos.value = pos.value / count * 0.7f
                     + 0.3f * (Math.abs(mixByte((pcmData[i * N + fitIndex(numOf40Ms / 4, channels)]),
                     (pcmData[i * N + fitIndex(numOf40Ms / 4, channels) + 1])))
@@ -41,6 +43,13 @@ public class AudioDataUtils {
         return posList;
     }
 
+    /**
+     * 取声道0的起始索引,下面的2是因为音频采样默认一个声道16bit
+     *
+     * @param index
+     * @param channels
+     * @return
+     */
     private static int fitIndex(int index, int channels) {
         if (index % (2 * channels) == 0) {
             return index;

@@ -98,7 +98,7 @@ public class RealPcmToAacHandler {
         int inputBufIndex, outputBufIndex;
         //取缓冲队列
         inputBufIndex = audioEncoder.dequeueInputBuffer(10000);
-        //TODO 编码
+        //编码
         if (inputBufIndex >= 0) {
             ByteBuffer inputBuffer = audioInputBuffers[inputBufIndex];
             inputBuffer.clear();//清除旧数据

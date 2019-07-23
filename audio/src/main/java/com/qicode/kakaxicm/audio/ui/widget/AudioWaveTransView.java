@@ -63,12 +63,57 @@ public class AudioWaveTransView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.e("audio_split", "绘制ondraw:" + posList.size());
         initOnce();
         drawAudio(canvas);
+        drawSplits(canvas);
+    }
+
+    private void drawSplits(Canvas canvas) {
+        if (!isReady() || lines == null) {
+            return;
+        }
+//        int h = getHeight();
+//        float cy = h * 0.5f;
+//        for (int i = 0; i < number; i++) {
+//            int index = posList.size() - 1 - i;
+//            if (index > 0) {
+//                Pos p = posList.get(index);
+//                if (p.split) {
+//                    float sx = lines[4 * i];
+//                    float sy = 0;
+//                    float ex = lines[4 * i];
+//                    float ey = 2 * cy;
+//                    canvas.drawLine(sx, sy, ex, ey, splitPaint);
+//                }
+//            }
+//        }
+
+        int h = getHeight();
+        float cy = h * 0.5f;
+        final int size = posList.size();
+        int index;
+        for (int i = 0; i < number; i++) {
+            index = size - 1 - i;
+            float d;
+            if (index >= 0) {
+                Pos p = posList.get(index);
+                d = cy;
+                d = Math.max(0, Math.min(h, d));
+                if (p.split) {
+                    Log.e("audio_split", "绘制分割线:" + size + " " + index);
+                    float sx = width * (number - i);
+                    float sy = cy - d;
+                    float ex = lines[4 * i];
+                    float ey = cy + d;
+                    canvas.drawLine(sx, sy, ex, ey, splitPaint);
+                }
+            }
+        }
     }
 
     private void drawAudio(Canvas canvas) {
-        if (!isReady()) {
+        if (!isReady() || lines == null) {
             return;
         }
 
@@ -149,6 +194,14 @@ public class AudioWaveTransView extends View {
             float d;
             if (index > 0) {
                 final Pos pos = posList.get(index);
+                if (pos.split) {
+                    Log.e("audio_split", "invalidate分割线索引:" + index);
+                    lines[4 * i] = width * (number - i);
+                    lines[4 * i + 1] = 0;
+                    lines[4 * i + 2] = lines[4 * i];
+                    lines[4 * i + 3] = 0;
+                    continue;
+                }
                 d = cy * pos.value / max;
                 d = Math.max(MIN, Math.min(cy, d));
             } else {
@@ -187,6 +240,14 @@ public class AudioWaveTransView extends View {
                             LinearGradient.TileMode.CLAMP));*/
             paint.setColor(color);
         }
+    }
+
+    public void stop() {
+        Pos p = new Pos();
+        p.split = true;
+        posList.add(p);
+        Log.e("audio_split", "stop:添加分割线" + posList.size());
+        invalidateData();
     }
 
     //线条
