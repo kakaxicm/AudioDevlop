@@ -250,6 +250,14 @@ public class AudioWaveTransView extends View {
         invalidateData();
     }
 
+    /**
+     * 清空
+     */
+    public void reset() {
+        posList.clear();
+        invalidateData();
+    }
+
     //线条
     public static class Pos {
         public float value;

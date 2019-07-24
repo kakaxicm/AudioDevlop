@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.qicode.kakaxicm.audio.model.PcmFile;
+import com.qicode.kakaxicm.audio.player.MutilPcmPlayer;
 import com.qicode.kakaxicm.audio.recorder.AbsAudioRecorder;
 import com.qicode.kakaxicm.audio.recorder.AudioRecordResult;
 import com.qicode.kakaxicm.audio.recorder.KAudioRecorder;
@@ -22,10 +24,15 @@ import com.qicode.kakaxicm.utils.StorageUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private AbsAudioRecorder recorder;
     private AudioWaveTransView audioWaveTransView;
+
+    private final List<PcmFile> pcmFiles = new ArrayList<>();
+    private MutilPcmPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +54,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFinish(AudioRecordResult result) {
                 File file = new File(result.filePath);
-                Log.e("AbsAudioRecorder", "onFinish:" + result.toString() + "录音文件是否存在:" + file.exists() + ",文件大小:" + file.length());
-
-//                testPlay(result.filePath);
+                PcmFile pcmFile = new PcmFile();
+                pcmFile.aacPath = result.filePath;
+                pcmFile.pcmPath = result.pcmPath;
+                pcmFile.duration = result.duration;
+                Log.e("PcmPlayer", "Record onFinish:" + pcmFile.toString());
+                pcmFiles.add(pcmFile);
                 audioWaveTransView.stop();
 
             }
@@ -68,33 +78,93 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onData(byte[] data) {
 //                Log.e("AbsAudioRecorder", "data.len:" + data.length);
-                if (recorder != null && recorder.isRecording()){
+                if (recorder != null && recorder.isRecording()) {
                     audioWaveTransView.insertData(data);
                 }
                 Log.e("audio_split", "onData");
             }
         });
-        ((KAudioRecorder) recorder).setPcmFile(new File(StorageUtils.getCommonCacheDir(this, "audio"), "audio_" + System.currentTimeMillis() + ".pcm"));
         findViewById(R.id.start).setOnClickListener(this);
         findViewById(R.id.cancel).setOnClickListener(this);
         findViewById(R.id.stop).setOnClickListener(this);
+        findViewById(R.id.play).setOnClickListener(this);
     }
 
-    private void testPlay(String path) {
-        final MediaPlayer player = new MediaPlayer();
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            player.setDataSource(path);
-            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    player.start();
+    private void initPlayer() {
+        player = new MutilPcmPlayer(this, pcmFiles, new MutilPcmPlayer.PcmPlayListener() {
+            @Override
+            public void onStart() {
+                Log.e("PcmPlayer", "onStart");
+                audioWaveTransView.reset();
+            }
+
+            @Override
+            public void onNext() {
+                Log.e("PcmPlayer", "onNext");
+                audioWaveTransView.stop();
+            }
+
+            @Override
+            public void onResume() {
+                Log.e("PcmPlayer", "onResume");
+            }
+
+            @Override
+            public void onPause() {
+                Log.e("PcmPlayer", "onPause");
+            }
+
+            @Override
+            public void onFinish() {
+                Log.e("PcmPlayer", "onFinish");
+            }
+
+            @Override
+            public void onData(byte[] data) {
+                if (player != null && player.isPlaying()) {
+                    audioWaveTransView.insertData(data);
+                    Log.e("PcmPlayer", "data.len:" + data.length);
                 }
-            });
-            player.prepareAsync();
-        } catch (IOException e) {
-            Log.e("AbsAudioRecorder", "播放异常:" + e);
+            }
+
+            @Override
+            public void onDuration(long duration) {
+                Log.e("PcmPlayer", "onDuration:" + duration);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+        });
+    }
+
+    private void playPcms() {
+        if (player == null) {
+            initPlayer();
+            player.start();
+        } else {
+            if (player.isPlaying()) {
+                player.pause();
+            } else {
+                player.start();
+            }
         }
+
+//        final MediaPlayer player = new MediaPlayer();
+//        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        try {
+//            player.setDataSource(path);
+//            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                @Override
+//                public void onPrepared(MediaPlayer mp) {
+//                    player.start();
+//                }
+//            });
+//            player.prepareAsync();
+//        } catch (IOException e) {
+//            Log.e("AbsAudioRecorder", "播放异常:" + e);
+//        }
     }
 
 
@@ -138,12 +208,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         final int id = v.getId();
         if (id == R.id.start) {
+            ((KAudioRecorder) recorder).setPcmFile(new File(StorageUtils.getCommonCacheDir(this, "audio"), "audio_" + System.currentTimeMillis() + ".pcm"));
             recorder.start();
         } else if (id == R.id.cancel) {
             recorder.cancel();
         } else if (id == R.id.stop) {
             recorder.stop();
-//            audioWaveTransView.stop();
+        } else if (id == R.id.play) {
+            playPcms();
         }
     }
 }
